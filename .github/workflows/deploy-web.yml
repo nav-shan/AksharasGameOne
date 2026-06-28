@@ -39,7 +39,10 @@ jobs:
         run: pip install pygbag
 
       - name: Build the web version
-        run: pygbag --build main.py
+        # --ume_block 0  -> start the game automatically (no "click to start"
+        #                   splash, which can look like a blank page)
+        # --can_close 0  -> don't show a close button
+        run: pygbag --build --ume_block 0 --can_close 0 main.py
 
       - name: Upload the built site
         uses: actions/upload-pages-artifact@v3
