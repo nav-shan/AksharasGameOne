@@ -15,6 +15,7 @@
 #  without touching this file at all.
 # =============================================================================
 
+import asyncio                       # lets the game run inside a web browser
 import pygame
 from levels import LEVELS
 
@@ -405,7 +406,8 @@ def draw_win_screen(screen, title_font, font, gem_total):
 #  This is the heart of the game: it starts everything, then runs the big loop.
 # =============================================================================
 
-def main():
+# This is "async" so it can run both on your computer AND inside a web browser.
+async def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Colour Swap")
@@ -590,6 +592,9 @@ def main():
 
         pygame.display.flip()
         clock.tick(FPS)
+        # Give the web browser a tiny moment to breathe each frame.
+        # (On a normal computer this does nothing noticeable.)
+        await asyncio.sleep(0)
 
     pygame.quit()
 
@@ -603,4 +608,4 @@ if __name__ == "__main__":
     print(" Then run it with:")
     print("     python game.py")
     print("=" * 55)
-    main()
+    asyncio.run(main())

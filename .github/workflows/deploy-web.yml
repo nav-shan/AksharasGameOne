@@ -1,0 +1,58 @@
+# Builds the game into a web (WebAssembly) version with pygbag and publishes
+# it to GitHub Pages, so anyone can play it from a link with no install.
+#
+# IMPORTANT one-time setup in your repo:
+#   Settings -> Pages -> "Build and deployment" -> Source: "GitHub Actions".
+name: Deploy game to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - claude/colour-swap-platformer-f5b3q6
+  workflow_dispatch:        # also lets you run it by hand from the Actions tab
+
+# Permissions the deploy step needs.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deploy at a time; cancel older runs in progress.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pygbag (the web packager)
+        run: pip install pygbag
+
+      - name: Build the web version
+        run: pygbag --build main.py
+
+      - name: Upload the built site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
