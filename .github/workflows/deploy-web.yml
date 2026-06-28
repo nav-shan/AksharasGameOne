@@ -49,6 +49,20 @@ jobs:
         with:
           path: build/web
 
+      # ---- itch.io package ------------------------------------------------
+      # Make a zip with index.html at its ROOT, which is exactly what itch.io
+      # wants for an HTML5 game. You download this from the run's "Artifacts".
+      - name: Make an itch.io-ready zip
+        run: |
+          cd build/web
+          zip -r ../../colour-swap-itch.zip .
+
+      - name: Upload the itch.io zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: colour-swap-itch-zip
+          path: colour-swap-itch.zip
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
